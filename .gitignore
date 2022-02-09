@@ -102,3 +102,15 @@ dist
 
 # TernJS port file
 .tern-port
+/.idea/
+/.git/
+/.github/
+/build/
+/dist/
+/utils/
+/package-lock.json
+/node_modules/
+/tests/package-lock.json
+/tests/build/
+/tests/node_modules/
+*.tgz
