@@ -8,6 +8,7 @@ import {createConnectionToken} from "./createConnectionToken";
 import {listDatabases} from "./listDatabases";
 import {deleteDatabase} from "./deleteDatabase";
 import {revokeConnectionToken} from "./revokeConnectionToken";
+import {SKSQL} from "sksql";
 var logger = require('morgan');
 
 var server: Server;
@@ -19,7 +20,7 @@ export function closeSocket() {
     }
 }
 
-export function setupSocket(port: number) {
+export function setupSocket(port: number, dbAccounts: SKSQL, dbQueue: SKSQL) {
 
     var server: Server = createServer({name: 'sksqlapi_endpoint'});
     server.use(logger('tiny'));
@@ -45,23 +46,23 @@ export function setupSocket(port: number) {
 
     server.post({path: '/api/v1/createDatabase', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
-        return createDatabase(cx);
+        return createDatabase(cx, dbAccounts, dbQueue);
     });
     server.post({path: '/api/v1/deleteDatabase', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
-        return deleteDatabase(cx);
+        return deleteDatabase(cx, dbAccounts, dbQueue);
     });
     server.post({path: '/api/v1/listDatabases', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
-        return listDatabases(cx);
+        return listDatabases(cx, dbAccounts, dbQueue);
     });
     server.post({path: '/api/v1/createConnectionToken', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
-        return createConnectionToken(cx);
+        return createConnectionToken(cx, dbAccounts, dbQueue);
     });
     server.post({path: '/api/v1/revokeConnectionToken', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
-        return revokeConnectionToken(cx);
+        return revokeConnectionToken(cx, dbAccounts, dbQueue);
     });
 
     server.on('uncaughtException', function (request, response, route, error) {

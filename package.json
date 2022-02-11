@@ -11,7 +11,7 @@
   "scripts": {
     "00-sksqlapi_endpoint-runAll": "npm run 02-sksqlapi_endpoint-build",
     "02-sksqlapi_endpoint-build": "tsc",
-    "03-sksqlapi_endpoint-run-local": "cross-env SKSQLAPI_ENDPOINT_LOGPATH='C:\\SKSQL_DBS\\sksqlapi_endpoint' SKWORKER_PORT=30000 node build/main.js"
+    "03-sksqlapi_endpoint-run-local": "cross-env SKSQLAPI_ENDPOINT_LOGPATH='C:\\SKSQL_DBS\\Logs\\SKSQLEndpoint' SKWORKER_PORT=30000 node build/main.js"
   },
   "license": "SSPL",
   "devDependencies": {

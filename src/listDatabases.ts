@@ -1,17 +1,17 @@
 import {RequestContext} from "./RequestContext";
-import {readTableAsJSON, SQLStatement, SQLResult} from "sksql";
+import {readTableAsJSON, SQLStatement, SQLResult, SKSQL} from "sksql";
 
 
-export function listDatabases(cx: RequestContext) {
+export function listDatabases(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SKSQL) {
     let apiKey = cx.request.body.apiKey;
 
     let sql = "EXECUTE usp_listDatabases @api_key = @api_key;"
 
-    let st = new SQLStatement(sql, true, "ws://127.0.0.1:30000");
+    let st = new SQLStatement(dbAccounts, sql, true);
     st.setParameter("@api_key", apiKey);
 
     let ret = st.run() as SQLResult;
-    let result = readTableAsJSON(ret.resultTableName);
+    let result = readTableAsJSON(dbAccounts, ret.resultTableName);
     st.close();
 
     let valid = true;

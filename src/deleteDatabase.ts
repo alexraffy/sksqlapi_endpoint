@@ -1,18 +1,18 @@
 import {RequestContext} from "./RequestContext";
-import {readTableAsJSON, SQLStatement, SQLResult} from "sksql";
+import {readTableAsJSON, SQLStatement, SQLResult, SKSQL} from "sksql";
 
 
-export function deleteDatabase(cx: RequestContext) {
+export function deleteDatabase(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
 
     let apiKey = cx.request.body.apiKey;
     let dbHashId = cx.request.body.dbHashId;
 
     let sql = "EXECUTE usp_deleteDatabase @api_key = @api_key, @dbHashId = @dbHashId;";
-    let st = new SQLStatement(sql, true, "ws://127.0.0.1:30000");
+    let st = new SQLStatement(dbAccounts, sql, true);
     st.setParameter("@api_key", apiKey);
     st.setParameter("@dbHashId", dbHashId);
     let ret = st.run() as SQLResult;
-    let result = readTableAsJSON(ret.resultTableName);
+    let result = readTableAsJSON(dbAccounts, ret.resultTableName);
     st.close();
 
     let valid = false;

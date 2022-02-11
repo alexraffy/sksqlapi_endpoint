@@ -1,9 +1,9 @@
 import {RequestContext} from "./RequestContext";
-import {readTableAsJSON, SQLStatement, generateV4UUID, SQLResult} from "sksql";
+import {readTableAsJSON, SQLStatement, generateV4UUID, SQLResult, SKSQL} from "sksql";
 
 
 
-export function createConnectionToken(cx: RequestContext) {
+export function createConnectionToken(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
 
     let apiKey = cx.request.body.apiKey;
     let dbHashId = cx.request.body.dbHashId;
@@ -17,7 +17,7 @@ export function createConnectionToken(cx: RequestContext) {
         "@api_key = @api_key, @dbHashId = @dbHashId, " +
         "@encryption_key = @encryption_key, @validityInMinutes = @validityInMinutes, " +
         "@optionalName = @optionalName, @token = @token;";
-    let st = new SQLStatement(sql, true, "ws://127.0.0.1:30000");
+    let st = new SQLStatement(dbAccounts, sql, true);
     st.setParameter("@api_key", apiKey);
     st.setParameter("@dbHashId", dbHashId);
     st.setParameter("@encryption_key", encryptionKey);
@@ -25,7 +25,7 @@ export function createConnectionToken(cx: RequestContext) {
     st.setParameter("@optionalName", optionalName);
     st.setParameter("@token", token);
     let ret = st.run() as SQLResult;
-    let result = readTableAsJSON(ret.resultTableName);
+    let result = readTableAsJSON(dbAccounts, ret.resultTableName);
     st.close();
 
 
