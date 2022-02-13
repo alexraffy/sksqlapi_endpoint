@@ -42,6 +42,7 @@ function setupQueueConnection (dbAccounts: SKSQL, dbQueue: SKSQL) {
             return {name: "Server", id: 1, token: "", valid: true} as TAuthSession
         },
         ready(db: SKSQL, databaseHashId: string): any {
+            let port = parseInt(process.env.SKWORKER_PORT);
             setupSocket(30100, dbAccounts, dbQueue);
         }
     });
@@ -63,6 +64,11 @@ function setup() {
     let log = new Logger(logPath);
     let dbAccounts = new SKSQL();
     let dbQueue = new SKSQL();
+
+    if (process.env.SKWORKER_PORT === undefined) {
+        Logger.instance.write("SKWORKER_PORT must be defined.");
+        process.exit(-1);
+    }
 
     reconnect(dbAccounts, dbQueue);
 
