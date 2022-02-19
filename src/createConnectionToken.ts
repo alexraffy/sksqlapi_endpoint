@@ -1,6 +1,6 @@
 import {RequestContext} from "./RequestContext";
-import {readTableAsJSON, SQLStatement, generateV4UUID, SQLResult, SKSQL} from "sksql";
-
+import {generateV4UUID, kResultType, readTableAsJSON, SKSQL, SQLResult, SQLStatement} from "sksql";
+import {updateTokens} from "./updateTokens";
 
 
 export function createConnectionToken(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
@@ -27,6 +27,10 @@ export function createConnectionToken(cx: RequestContext, dbAccounts: SKSQL, dbQ
     let ret = st.run() as SQLResult;
     let result = readTableAsJSON(dbAccounts, ret.resultTableName);
     st.close();
+
+
+    updateTokens(dbAccounts, dbQueue, result[0].account_id, result[0].database_id);
+
 
 
     // SELECT true as valid, @database_id as database_id, @token as token, @validity as validity FROM dual;

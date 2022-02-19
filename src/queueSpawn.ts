@@ -35,7 +35,9 @@ export function queueSpawn(dbAccounts: SKSQL,
     stQueue.setParameter("@port", port);
     stQueue.setParameter("@encryptionKey", encryptionKey);
     let ret = stQueue.run();
+    stQueue.close();
 
+    return public_address + "/ws/" + port;
 
 
 }

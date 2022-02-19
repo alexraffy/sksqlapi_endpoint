@@ -9,6 +9,7 @@ import {listDatabases} from "./listDatabases";
 import {deleteDatabase} from "./deleteDatabase";
 import {revokeConnectionToken} from "./revokeConnectionToken";
 import {SKSQL} from "sksql";
+import {connect} from "./connect";
 var logger = require('morgan');
 
 var server: Server;
@@ -63,6 +64,10 @@ export function setupSocket(port: number, dbAccounts: SKSQL, dbQueue: SKSQL) {
     server.post({path: '/api/v1/revokeConnectionToken', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
         return revokeConnectionToken(cx, dbAccounts, dbQueue);
+    });
+    server.post({path: '/api/v1/connect', version: '0.0.1'}, function (req, res, next) {
+        let cx: RequestContext = {request: req, response: res, next: next};
+        return connect(cx, dbAccounts, dbQueue);
     });
 
     server.on('uncaughtException', function (request, response, route, error) {
