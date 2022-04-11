@@ -15,12 +15,13 @@
   },
   "license": "SSPL",
   "devDependencies": {
+    "typescript": "^4.6.3",
     "@types/node": "^17.0.0",
     "cross-env": "^7.0.3",
     "@types/ws": "^8.2.2"
   },
   "dependencies": {
-    "sksql":  "^1.1.5",
+    "sksql":  "^1.1.6",
     "restify": "^8.6.0",
     "morgan": "^1.10.0",
     "ws": "^8.4.2",
