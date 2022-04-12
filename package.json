@@ -21,7 +21,7 @@
     "@types/ws": "^8.2.2"
   },
   "dependencies": {
-    "sksql":  "^1.1.6",
+    "sksql":  "^1.1.8",
     "restify": "^8.6.0",
     "morgan": "^1.10.0",
     "ws": "^8.4.2",
