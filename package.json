@@ -1,6 +1,6 @@
 {
   "name": "sksqlapi_endpoint",
-  "version": "1.1.5",
+  "version": "1.1.10",
   "description": "APIServer for sksql",
   "author": {
     "name": "ARaffy"
@@ -21,7 +21,7 @@
     "@types/ws": "^8.2.2"
   },
   "dependencies": {
-    "sksql":  "^1.1.9",
+    "sksql":  "^1.1.10",
     "restify": "^8.6.0",
     "morgan": "^1.10.0",
     "ws": "^8.4.2",
