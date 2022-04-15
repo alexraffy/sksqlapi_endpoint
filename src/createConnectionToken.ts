@@ -24,9 +24,21 @@ export function createConnectionToken(cx: RequestContext, dbAccounts: SKSQL, dbQ
     st.setParameter("@validityInMinutes", validityInMinutes);
     st.setParameter("@optionalName", optionalName);
     st.setParameter("@token", token);
-    let ret = st.run() as SQLResult;
-    let result = readTableAsJSON(dbAccounts, ret.resultTableName);
+    let ret;
+    let result;
+    try {
+        ret = st.run() as SQLResult;
+        result = readTableAsJSON(dbAccounts, ret.resultTableName);
+    } catch (e) {
+        cx.response.send(200, {valid: false});
+        return cx.next();
+    }
     st.close();
+
+    if (result.length !== 0 || result[0].valid !== true) {
+        cx.response.send(200, {valid: false});
+        return cx.next();
+    }
 
 
     updateTokens(dbAccounts, dbQueue, result[0].account_id, result[0].database_id);
