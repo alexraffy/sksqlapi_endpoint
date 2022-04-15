@@ -43,7 +43,7 @@ export function createConnectionToken(cx: RequestContext, dbAccounts: SKSQL, dbQ
     }
     st.close();
 
-    if (result.length !== 0 || result[0].valid !== true) {
+    if (result.length === 0 || result[0].valid !== true) {
         Logger.instance.write("INFO REJECTED createConnectionToken");
         cx.response.send(200, {valid: false});
         return cx.next();
