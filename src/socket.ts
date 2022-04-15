@@ -98,6 +98,6 @@ export function setupSocket(port: number, dbAccounts: SKSQL, dbQueue: SKSQL) {
     });
 
     server.listen(port);
-
+    Logger.instance.write("Listening on port " + port);
 
 }
