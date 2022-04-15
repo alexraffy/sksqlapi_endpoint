@@ -24,7 +24,16 @@ export function closeSocket() {
 export function setupSocket(port: number, dbAccounts: SKSQL, dbQueue: SKSQL) {
 
     var server: Server = createServer({name: 'sksqlapi_endpoint'});
-    server.use(logger('tiny'));
+    server.use(logger(function (tokens, req, res) {
+        return [
+            new Date().toISOString(),
+            tokens.method(req, res),
+            tokens.url(req, res),
+            tokens.status(req, res),
+            tokens.res(req, res, 'content-length'), '-',
+            tokens['response-time'](req, res), 'ms'
+        ].join(' ')
+    }, {stream: Logger.instance.stream}));
     server.use(plugins.queryParser());
     server.use(plugins.bodyParser({mapParams: true, mapFiles: true, keepExtensions: true}));
 

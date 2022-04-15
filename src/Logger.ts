@@ -4,7 +4,7 @@ import * as fs from "fs";
 
 export class Logger {
     private static _instance: Logger;
-    private stream: WriteStream;
+    public stream: WriteStream;
 
     static get instance(): Logger {
         if (Logger._instance === undefined) {
@@ -25,6 +25,7 @@ export class Logger {
             return previous + current;
         })
         this.stream.write(message + "\r\n");
+        console.log(message);
     }
 
     close() {
