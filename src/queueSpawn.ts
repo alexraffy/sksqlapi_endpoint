@@ -35,8 +35,14 @@ export function queueSpawn(dbAccounts: SKSQL,
     stQueue.setParameter("@database_id", database_id);
     stQueue.setParameter("@port", port);
     stQueue.setParameter("@encryptionKey", encryptionKey);
-    let ret = stQueue.run();
+    let ret = stQueue.run() as SQLResult;
+    if (ret.error !== undefined) {
+        Logger.instance.write("INFO SQLERROR usp_enqeue : ", ret.error);
+        return;
+    }
     stQueue.close();
+
+    Logger.instance.write("INFO queueSpawn @worker_id = " + worker_id);
 
     return public_address + "/ws/" + port;
 
