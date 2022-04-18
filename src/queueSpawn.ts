@@ -42,7 +42,7 @@ export function queueSpawn(dbAccounts: SKSQL,
     }
     stQueue.close();
 
-    Logger.instance.write("INFO queueSpawn @worker_id = " + worker_id);
+    Logger.instance.write("INFO queueSpawn @worker_id = " + worker_id + " port: " + port + " for database "  + database_id);
 
     return public_address + "/ws/" + port;
 
