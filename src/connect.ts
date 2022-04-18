@@ -5,9 +5,11 @@ import {queueSpawn} from "./queueSpawn";
 
 
 export function connect(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
+
+    Logger.instance.write("INFO STARTOF createConnectionToken");
+
     let dbHashId = cx.request.body.dbHashId;
     let token = cx.request.body.token;
-
     let sql = "Execute usp_connect @dbHashId = @dbHashId, @token = @token";
     let req = new SQLStatement(dbAccounts, sql, true);
     req.setParameter("@dbHashId", dbHashId);

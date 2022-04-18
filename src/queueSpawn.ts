@@ -7,14 +7,15 @@ export function queueSpawn(dbAccounts: SKSQL,
                            account_id: number,
                            database_id: number,
                            encryptionKey: string) {
-
+    Logger.instance.write("INFO STARTOF queueSpawn account_id = " + account_id + " database_id = " + database_id + " encryptionKey = " +
+        (encryptionKey === undefined || encryptionKey === "") ? "NONE" : "PRESENT");
     let sqlWorker = "Execute usp_spawnWorker @account_id = @account_id, @database_id = @database_id;";
     let stWorker = new SQLStatement(dbAccounts, sqlWorker, true);
     stWorker.setParameter("@account_id", account_id);
     stWorker.setParameter("@database_id", database_id);
     let retWorker = stWorker.run() as SQLResult;
     if (retWorker.error !== undefined) {
-        Logger.instance.write("ERROR usp_spawnWorker : ", retWorker.error);
+        Logger.instance.write("INFO SQLERROR usp_spawnWorker : ", retWorker.error);
         return;
     }
     let workerData = readTableAsJSON(dbAccounts, retWorker.resultTableName);
