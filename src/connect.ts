@@ -6,7 +6,7 @@ import {queueSpawn} from "./queueSpawn";
 
 export function connect(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
 
-    Logger.instance.write("INFO STARTOF createConnectionToken");
+    Logger.instance.write("INFO STARTOF connect");
 
     let dbHashId = cx.request.body.dbHashId;
     let token = cx.request.body.token;
@@ -16,7 +16,7 @@ export function connect(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
     req.setParameter("@token", token);
     let res = req.run() as SQLResult;
     if (res.error !== undefined) {
-        Logger.instance.write("usp_connect ERROR: ", res.error);
+        Logger.instance.write("usp_connect ERROR: " + res.error);
         req.close();
         cx.response.send(200, {valid: false});
         return cx.next();
