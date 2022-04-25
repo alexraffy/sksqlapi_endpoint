@@ -8,7 +8,7 @@ export function queueSpawn(dbAccounts: SKSQL,
                            database_id: number,
                            encryptionKey: string) {
     Logger.instance.write("INFO STARTOF queueSpawn account_id = " + account_id + " database_id = " + database_id + " encryptionKey = " +
-        (encryptionKey === undefined || encryptionKey === "") ? "NONE" : "PRESENT");
+        ((encryptionKey === undefined || encryptionKey === "") ? "NONE" : "PRESENT"));
     let sqlWorker = "Execute usp_spawnWorker @account_id = @account_id, @database_id = @database_id;";
     let stWorker = new SQLStatement(dbAccounts, sqlWorker, true);
     stWorker.setParameter("@account_id", account_id);
