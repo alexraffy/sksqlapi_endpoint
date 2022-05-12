@@ -48,6 +48,7 @@ export function connect(cx: RequestContext, dbAccounts: SKSQL, dbQueue: SKSQL) {
     if (address === undefined) {
         cx.response.send(200, {valid: false});
     } else {
+        Logger.instance.write("connect OK: " + address);
         cx.response.send(200, {valid: true, address: address});
     }
     return cx.next();
