@@ -10,6 +10,7 @@ import {deleteDatabase} from "./deleteDatabase";
 import {revokeConnectionToken} from "./revokeConnectionToken";
 import {SKSQL} from "sksql";
 import {connect} from "./connect";
+import {databaseInfo} from "./databaseInfo";
 var logger = require('morgan');
 
 var server: Server;
@@ -66,6 +67,10 @@ export function setupSocket(port: number, dbAccounts: SKSQL, dbQueue: SKSQL) {
         let cx: RequestContext = {request: req, response: res, next: next};
         return listDatabases(cx, dbAccounts, dbQueue);
     });
+    server.post({path: '/api/v1/databaseInfo', version: '0.0.1'}, function (req, res, next) {
+        let cx: RequestContext = {request: req, response: res, next: next};
+        return databaseInfo(cx, dbAccounts, dbQueue);
+    })
     server.post({path: '/api/v1/createConnectionToken', version: '0.0.1'}, function (req, res, next) {
         let cx: RequestContext = {request: req, response: res, next: next};
         return createConnectionToken(cx, dbAccounts, dbQueue);

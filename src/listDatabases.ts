@@ -4,11 +4,14 @@ import {readTableAsJSON, SQLStatement, SQLResult, SKSQL} from "sksql";
 
 export function listDatabases(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SKSQL) {
     let apiKey = cx.request.body.apiKey;
+    let top = cx.request.body.top;
+    let offset = cx.request.body.offset;
 
     let sql = "EXECUTE usp_listDatabases @api_key = @api_key;"
 
     let st = new SQLStatement(dbAccounts, sql, true);
     st.setParameter("@api_key", apiKey);
+
 
     let ret = st.run() as SQLResult;
     let result = readTableAsJSON(dbAccounts, ret.resultTableName);
