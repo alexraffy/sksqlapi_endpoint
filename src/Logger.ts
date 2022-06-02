@@ -14,7 +14,7 @@ export class Logger {
     }
     constructor(logFolder: string) {
         Logger._instance = this;
-        const logPath = path.normalize(logFolder + "/sksqlapi_endpoint.log");
+        const logPath = path.normalize(logFolder + "/" + new Date().toISOString() + "_sksqlapi_endpoint.log");
 
         this.stream = fs.createWriteStream(logPath, {encoding: "utf-8"});
 
