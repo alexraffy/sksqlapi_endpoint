@@ -74,6 +74,11 @@ function setup() {
         process.exit(-1);
     }
 
+    process.on('uncaughtException', function(error) {
+        Logger.instance.write("UNEXPECTED ERROR: " + error.message);
+        process.exit(1)
+    });
+
     reconnect(dbAccounts, dbQueue);
 
 }

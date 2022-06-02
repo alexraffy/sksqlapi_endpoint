@@ -50,33 +50,37 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
     const backupsPath = path.normalize(dbPath + "backups");
 
     let logsInfo: {filename: string, date: string, workerId: string}[] = [];
-    const logsFiles = fs.readdirSync(logsPath);
-    logsFiles.forEach(file => {
-        let filePath = path.normalize(logsPath + "/" + file);
-        const stat = fs.statSync(filePath);
-        if (stat.isFile() && filePath.endsWith(".log")) {
-            let fileName = file.replace(".log", "");
-            // format datetime_workerid
-            if (fileName.indexOf("_") > -1) {
-                let fileNameParts = fileName.split("_");
-                let dateiso = fileNameParts[0];
-                let workerId = fileNameParts[1];
-                logsInfo.push({filename: filePath, date: dateiso, workerId: workerId });
+    if (fs.existsSync(logsPath)) {
+        const logsFiles = fs.readdirSync(logsPath);
+        logsFiles.forEach(file => {
+            let filePath = path.normalize(logsPath + "/" + file);
+            const stat = fs.statSync(filePath);
+            if (stat.isFile() && filePath.endsWith(".log")) {
+                let fileName = file.replace(".log", "");
+                // format datetime_workerid
+                if (fileName.indexOf("_") > -1) {
+                    let fileNameParts = fileName.split("_");
+                    let dateiso = fileNameParts[0];
+                    let workerId = fileNameParts[1];
+                    logsInfo.push({filename: filePath, date: dateiso, workerId: workerId});
+                }
             }
-        }
-    });
+        });
+    }
 
     let backupsInfo: {filename: string, date: string, size: number}[] = [];
-    const backupsFiles = fs.readdirSync(backupsPath);
-    backupsFiles.forEach(file => {
-        let filePath = path.normalize(backupsPath + "/" + file);
-        const stat = fs.statSync(filePath);
-        if (stat.isFile() && filePath.endsWith(".zip")) {
-            let fileName = file.replace(".zip", "");
-            // format datetime
-            backupsInfo.push({filename: filePath, date: fileName, size: stat.size });
-        }
-    });
+    if (fs.existsSync(backupsPath)) {
+        const backupsFiles = fs.readdirSync(backupsPath);
+        backupsFiles.forEach(file => {
+            let filePath = path.normalize(backupsPath + "/" + file);
+            const stat = fs.statSync(filePath);
+            if (stat.isFile() && filePath.endsWith(".zip")) {
+                let fileName = file.replace(".zip", "");
+                // format datetime
+                backupsInfo.push({filename: filePath, date: fileName, size: stat.size});
+            }
+        });
+    }
     payload.logsInfo = logsInfo;
     payload.backupsInfo = backupsInfo;
 
