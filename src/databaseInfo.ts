@@ -4,10 +4,29 @@ import {Logger} from "./Logger";
 import * as path from "path";
 import * as fs from "fs";
 
+
+interface TDatabaseInfoSQL {
+    valid: boolean;
+    account_id: number;
+    database_id: number;
+    created?: string;
+    optionalName?: string;
+    status?: boolean;
+    users?: number;
+    tokens?: string;
+    workers?: string;
+}
+
 interface TDatabaseInfo {
     valid: boolean;
-    backupsInfo?: {filename: string, date: string, size: number}[],
-    logsInfo?: {filename: string, date: string, workerId: string}[]
+    created?: string;
+    optionalName?: string;
+    status?: boolean;
+    users?: number;
+    tokens?: { token: string; validity: string }[];
+    workers?: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string}[];
+    backupsInfo?: {filename: string, date: string, size: number}[];
+    logsInfo?: {filename: string, date: string, workerId: string}[];
 }
 
 export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SKSQL) {
@@ -19,7 +38,7 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
     let st = new SQLStatement(dbAccounts, sql, true);
     st.setParameter("@apiKey", apiKey);
     st.setParameter("@dbHashId", dbHashId);
-    let result = [];
+    let result: TDatabaseInfoSQL[] = [];
     let valid = true;
     try {
         let ret = st.run() as SQLResult;
@@ -29,14 +48,12 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
         Logger.instance.write(sqlError.message);
         valid = false;
     }
-    let payload: TDatabaseInfo = { valid: false};
-    if (result === undefined || result.length !== 1) {
+
+    if (result === undefined || result.length !== 1 || result[0].valid === false) {
         valid = false;
-    } else {
-        payload = result[0];
     }
 
-    if (valid === false || payload.valid === false) {
+    if (valid === false) {
         cx.response.send(200, {valid: false});
         return cx.next();
     }
@@ -81,8 +98,50 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
             }
         });
     }
-    payload.logsInfo = logsInfo;
-    payload.backupsInfo = backupsInfo;
+
+    let workers: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string}[] = [];
+    let tokens: { token: string; validity: string }[] = [];
+
+    if (result[0].tokens !== undefined && result[0].tokens !== "") {
+        let array = result[0].tokens.split(",");
+        for (let i = 0; i < array.length; i++) {
+            const parts = array[i].split(" ");
+            if (parts.length === 2) {
+                const token = parts[0];
+                const validity = parts[1];
+                tokens.push({token: token, validity: validity});
+            }
+        }
+    }
+
+    if (result[0].workers !== undefined && result[0].workers !== "") {
+        let array = result[0].workers.split(",");
+        for (let i = 0; i < array.length; i++) {
+            const parts = array[i].split(" ");
+            if (parts.length === 5) {
+                const address = parts[0];
+                const isRelay = parts[1];
+                const isReadOnly = parts[2];
+                const status = parts[3];
+                const heartbeat = parts[4]
+                workers.push({address: address, isRelay: isRelay.toUpperCase() === "TRUE", readOnly: isReadOnly.toUpperCase() === "TRUE", status: status, heartbeat: heartbeat});
+            }
+        }
+    }
+
+
+    let payload: TDatabaseInfo = {
+        valid: true,
+        created: result[0].created,
+        optionalName: result[0].optionalName,
+        status: result[0].status,
+        users: result[0].users,
+        tokens: tokens,
+        workers: workers,
+        logsInfo: logsInfo,
+        backupsInfo: backupsInfo
+    }
+
 
     cx.response.send(200, payload);
     return cx.next();
