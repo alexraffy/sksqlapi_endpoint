@@ -3,6 +3,7 @@ import {readTableAsJSON, SKSQL, SQLResult, SQLStatement} from "sksql";
 import {Logger} from "./Logger";
 import * as path from "path";
 import * as fs from "fs";
+import {getFolderSize} from "./getFolderSize";
 
 
 interface TDatabaseInfoSQL {
@@ -23,6 +24,7 @@ interface TDatabaseInfo {
     optionalName?: string;
     live?: boolean;
     connections?: number;
+    size: number;
     tokens?: { token: string; validity: string }[];
     workers?: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string, connections: number}[];
     backupsInfo?: {filename: string, date: string, size: number}[];
@@ -61,11 +63,17 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
     let account_id = result[0].account_id;
     let database_id = result[0].database_id;
 
-    // get list of logs
     const dbPath = path.normalize("/data/" + account_id + "/" + database_id + "/");
-    const logsPath = path.normalize(dbPath + "logs");
-    const backupsPath = path.normalize(dbPath + "backups");
 
+    // get size of db
+    const dataPath = path.normalize(dbPath + "db/");
+    let dbSize = 0;
+    if (fs.existsSync(dataPath)) {
+        dbSize = getFolderSize(dataPath);
+    }
+
+    // get list of logs
+    const logsPath = path.normalize(dbPath + "logs");
     let logsInfo: {filename: string, date: string, workerId: string}[] = [];
     if (fs.existsSync(logsPath)) {
         const logsFiles = fs.readdirSync(logsPath);
@@ -84,7 +92,8 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
             }
         });
     }
-
+    // get list of backups
+    const backupsPath = path.normalize(dbPath + "backups");
     let backupsInfo: {filename: string, date: string, size: number}[] = [];
     if (fs.existsSync(backupsPath)) {
         const backupsFiles = fs.readdirSync(backupsPath);
@@ -137,6 +146,7 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
         optionalName: result[0].optionalName,
         live: result[0].live,
         connections: result[0].connections,
+        size: dbSize,
         tokens: tokens,
         workers: workers,
         logsInfo: logsInfo,
