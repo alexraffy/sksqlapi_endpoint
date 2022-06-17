@@ -11,8 +11,8 @@ interface TDatabaseInfoSQL {
     database_id: number;
     created?: string;
     optionalName?: string;
-    status?: boolean;
-    users?: number;
+    live?: boolean;
+    connections?: number;
     tokens?: string;
     workers?: string;
 }
@@ -21,10 +21,10 @@ interface TDatabaseInfo {
     valid: boolean;
     created?: string;
     optionalName?: string;
-    status?: boolean;
-    users?: number;
+    live?: boolean;
+    connections?: number;
     tokens?: { token: string; validity: string }[];
-    workers?: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string}[];
+    workers?: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string, connections: number}[];
     backupsInfo?: {filename: string, date: string, size: number}[];
     logsInfo?: {filename: string, date: string, workerId: string}[];
 }
@@ -99,7 +99,7 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
         });
     }
 
-    let workers: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string}[] = [];
+    let workers: { address:string, isRelay: boolean, readOnly: boolean, status: string, heartbeat: string, connections: number}[] = [];
     let tokens: { token: string; validity: string }[] = [];
 
     if (result[0].tokens !== undefined && result[0].tokens !== "") {
@@ -118,13 +118,14 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
         let array = result[0].workers.split(",");
         for (let i = 0; i < array.length; i++) {
             const parts = array[i].split(" ");
-            if (parts.length === 5) {
+            if (parts.length === 6) {
                 const address = parts[0];
                 const isRelay = parts[1];
                 const isReadOnly = parts[2];
                 const status = parts[3];
-                const heartbeat = parts[4]
-                workers.push({address: address, isRelay: isRelay.toUpperCase() === "TRUE", readOnly: isReadOnly.toUpperCase() === "TRUE", status: status, heartbeat: heartbeat});
+                const heartbeat = parts[4];
+                const connections = parts[5];
+                workers.push({address: address, isRelay: isRelay.toUpperCase() === "TRUE", readOnly: isReadOnly.toUpperCase() === "TRUE", status: status, heartbeat: heartbeat, connections: parseInt(connections)});
             }
         }
     }
@@ -134,8 +135,8 @@ export function databaseInfo(cx: RequestContext,  dbAccounts: SKSQL, dbQueue: SK
         valid: true,
         created: result[0].created,
         optionalName: result[0].optionalName,
-        status: result[0].status,
-        users: result[0].users,
+        live: result[0].live,
+        connections: result[0].connections,
         tokens: tokens,
         workers: workers,
         logsInfo: logsInfo,
